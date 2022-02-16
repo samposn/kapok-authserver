@@ -1,0 +1,46 @@
+@startuml
+
+class ClientAPI
+'/api/clients/*
+
+class DynamicClientRegistrationEndpoint
+'/register/*
+
+package org.springframework.security.oauth2.provider {
+    interface ClientDetailsService {
+        + ClientDetails loadClientByClientId(String clientId)
+    }
+}
+interface ClientDetailsEntityService
+class DefaultOAuth2ClientDetailsEntityService
+ClientDetailsService <|-- ClientDetailsEntityService
+ClientDetailsEntityService <|.. DefaultOAuth2ClientDetailsEntityService
+
+interface OAuth2ClientRepository
+class JpaOAuth2ClientRepository
+OAuth2ClientRepository <|.. JpaOAuth2ClientRepository
+
+package org.springframework.security.oauth2.provider {
+    interface ClientDetails {
+        + String clientId
+        + Set<String> resourceIds
+        + boolean secretRequired
+        + String clientSecret
+        + boolean scoped
+        + Set<String> scope
+        + Set<String> authorizedGrantTypes
+        + Set<String> registeredRedirectUri
+        + Collection<GrantedAuthority> authorities
+        + Integer accessTokenValiditySeconds
+        + Integer refreshTokenValiditySeconds
+        + Map<String, Object> additionalInformation
+
+        + boolean isAutoApprove(String scope)
+    }
+}
+interface RegisteredClientFields
+class ClientDetailsEntity
+class RegisteredClient
+ClientDetails <|.. ClientDetailsEntity
+
+@enduml

@@ -1,0 +1,33 @@
+@startuml
+
+title spring-security-oauth2
+
+interface ClientDetailsService {
+    + ClientDetails loadClientByClientId(String clientId)
+}
+interface ClientRegistrationService {
+	+ void addClientDetails(ClientDetails clientDetails)
+	+ void updateClientDetails(ClientDetails clientDetails)
+	+ void updateClientSecret(String clientId, String secret)
+	+ void removeClientDetails(String clientId)
+	+ List<ClientDetails> listClientDetails()
+}
+class InMemoryClientDetailsService
+class JdbcClientDetailsService
+ClientDetailsService <|.. InMemoryClientDetailsService
+ClientDetailsService <|.. JdbcClientDetailsService
+ClientRegistrationService <|.. JdbcClientDetailsService
+
+
+interface ClientDetails
+class BaseClientDetails
+ClientDetails <|.. BaseClientDetails
+
+
+
+
+
+
+
+
+@enduml

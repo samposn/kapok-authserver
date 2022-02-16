@@ -1,0 +1,54 @@
+@startuml
+
+title OpenID-Connect-Java-Spring-Server:Token-Class
+
+class TokenAPI
+'/api/tokens/*
+
+package org.springframework.security.oauth2.provider.token {
+    interface AuthorizationServerTokenServices {
+        + OAuth2AccessToken createAccessToken(OAuth2Authentication authentication)
+        + OAuth2AccessToken refreshAccessToken(String refreshToken, TokenRequest tokenRequest)
+        + OAuth2AccessToken getAccessToken(OAuth2Authentication authentication)
+    }
+    interface ResourceServerTokenServices {
+        + OAuth2Authentication loadAuthentication(String accessToken)
+        + OAuth2AccessToken readAccessToken(String accessToken)
+    }
+}
+interface OAuth2TokenEntityService
+class DefaultOAuth2ProviderTokenService
+AuthorizationServerTokenServices <|-- OAuth2TokenEntityService
+ResourceServerTokenServices <|-- OAuth2TokenEntityService
+OAuth2TokenEntityService <|-- DefaultOAuth2ProviderTokenService
+
+interface OAuth2TokenRepository
+class JpaOAuth2TokenRepository
+OAuth2TokenRepository <|-- JpaOAuth2TokenRepository
+
+package org.springframework.security.oauth2.common {
+    interface OAuth2AccessToken {
+        + String tokenType
+        + Map<String, Object> additionalInformation
+	    + Set<String> scope
+	    + OAuth2RefreshToken refreshToken
+	    + boolean expired
+        + Date expiration
+        + int expiresIn
+        + String value
+    }
+    interface OAuth2RefreshToken {
+        + String value
+    }
+}
+
+class OAuth2AccessTokenEntity
+OAuth2AccessToken <|-- OAuth2AccessTokenEntity
+
+class OAuth2RefreshTokenEntity
+OAuth2RefreshToken <|-- OAuth2RefreshTokenEntity
+
+
+
+
+@enduml

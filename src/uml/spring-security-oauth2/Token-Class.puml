@@ -1,0 +1,101 @@
+@startuml
+
+title spring-security-oauth2:Token-Class
+
+together {
+    interface AuthorizationServerTokenServices {
+        + OAuth2AccessToken createAccessToken(OAuth2Authentication authentication) throws AuthenticationException
+        + OAuth2AccessToken refreshAccessToken(String refreshToken, TokenRequest tokenRequest)
+        + OAuth2AccessToken getAccessToken(OAuth2Authentication authentication)
+    }
+    interface ResourceServerTokenServices {
+        + OAuth2Authentication loadAuthentication(String accessToken)
+        + OAuth2AccessToken readAccessToken(String accessToken)
+    }
+    interface ConsumerTokenServices {
+        + boolean revokeToken(String tokenValue)
+    }
+    class DefaultTokenServices
+    AuthorizationServerTokenServices <|.. DefaultTokenServices
+    ResourceServerTokenServices <|.. DefaultTokenServices
+    ConsumerTokenServices <|.. DefaultTokenServices
+}
+
+
+
+DefaultTokenServices -[hidden]-> TokenStore
+
+
+
+together {
+    interface TokenStore {
+            + OAuth2Authentication readAuthentication(OAuth2AccessToken token)
+            + OAuth2Authentication readAuthentication(String token)
+            + void storeAccessToken(OAuth2AccessToken token, OAuth2Authentication authentication)
+            + OAuth2AccessToken readAccessToken(String tokenValue)
+            + void removeAccessToken(OAuth2AccessToken token)
+            + void storeRefreshToken(OAuth2RefreshToken refreshToken, OAuth2Authentication authentication)
+            + OAuth2RefreshToken readRefreshToken(String tokenValue)
+            + OAuth2Authentication readAuthenticationForRefreshToken(OAuth2RefreshToken token)
+            + void removeRefreshToken(OAuth2RefreshToken token)
+            + void removeAccessTokenUsingRefreshToken(OAuth2RefreshToken refreshToken)
+            + OAuth2AccessToken getAccessToken(OAuth2Authentication authentication)
+            + Collection<OAuth2AccessToken> findTokensByClientIdAndUserName(String clientId, String userName)
+            + Collection<OAuth2AccessToken> findTokensByClientId(String clientId)
+    }
+    class InMemoryTokenStore
+    class JdbcTokenSto
+    class JwtTokenStore
+    class RedisTokenStore
+    class JwkTokenStore
+    TokenStore <|.. InMemoryTokenStore
+    TokenStore <|.. JdbcTokenSto
+    TokenStore <|.. JwtTokenStore
+    TokenStore <|.. RedisTokenStore
+    TokenStore <|.. JwkTokenStore
+}
+
+
+
+JwtTokenStore -[hidden]-> OAuth2AccessToken
+
+
+
+together {
+    interface OAuth2AccessToken {
+        + String tokenType
+        + Map<String, Object> additionalInformation
+        + Set<String> scope
+        + OAuth2RefreshToken refreshToken
+        + boolean expired
+        + Date expiration
+        + int expiresIn
+        + String value
+    }
+    class DefaultOAuth2AccessToken
+    OAuth2AccessToken <|.. DefaultOAuth2AccessToken
+}
+
+
+
+JwkTokenStore -[hidden]-> OAuth2RefreshToken
+
+
+
+together {
+    interface OAuth2RefreshToken {
+        + String value
+    }
+    interface ExpiringOAuth2RefreshToken {
+        + Date getExpiration()
+    }
+    class DefaultOAuth2RefreshToken
+    class DefaultExpiringOAuth2RefreshToken
+    OAuth2RefreshToken <|-- ExpiringOAuth2RefreshToken
+    OAuth2RefreshToken <|.. DefaultOAuth2RefreshToken
+    DefaultOAuth2RefreshToken <|-- DefaultExpiringOAuth2RefreshToken
+    ExpiringOAuth2RefreshToken <|.. DefaultExpiringOAuth2RefreshToken
+}
+
+
+@enduml
